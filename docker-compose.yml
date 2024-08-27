@@ -1,0 +1,32 @@
+services:
+  newsletter.api:
+    image: ${DOCKER_REGISTRY-}newsletterapi
+    build:
+      context: .
+      dockerfile: Newsletter.Api/Dockerfile
+
+  newsletter-db:
+    image: postgres:latest
+    container_name: newsletter_database
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=newsletter_db
+      - POSTGRES_PASSWORD=postgres
+    volumes:
+      - ~/.docker-conf/staging/postgres:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+
+  newsletter-mq:
+    image: rabbitmq:3-management
+    container_name: newsletter_mq
+    hostname: newsletter-mq
+    volumes:
+        - ~/.docker-conf/staging/rabbitmq/data/:/var/lib/rabbitmq
+        - ~/.docker-conf/staging/rabbitmq/log/:/var/log/rabbitmq
+    ports:
+      - 5672:5672
+      - 15672:15672
+    environment:
+        RABBITMQ_DEFAULT_USER: guest
+        RABBITMQ_DEFAULT_PASS: guest
